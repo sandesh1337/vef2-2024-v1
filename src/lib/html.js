@@ -66,30 +66,23 @@ export function stodurTemplate(points) {
 }
 
 
-
 export function leikirTemplate(games) {
-
   const title = 'Boltadeildin—leikir!';
 
-
-
-  // Start gamesHtml with the table structure and header row
   let gamesHtml = '<table><tr><th>Home Team Name</th><th>Home Score</th><th>Away Score</th><th>Away Team Name</th><th>Date</th></tr>';
 
-  // Iterate through each game day and each game
-  for (let i = 0; i < games.length; i++) {
-    const gameDay = new Date(games[i].date);
+  for (let i = 0; i < games.length; i += 1) {
+    // Removed or commented out the unused 'gameDay' variable
+    // const gameDay = new Date(games[i].date);
 
-
-
-    for (let j = 0; j < games[i].games.length; j++) {
+    for (let j = 0; j < games[i].games.length; j += 1) {
       const game = games[i].games[j];
-      gamesHtml += `<tr><td>${game.home.name}</td><td>${game.home.score}</td><td>${game.away.score}</td><td>${game.away.name}</td><td>${games[i].date.split('T')[0]}</td></tr>`;
+      gamesHtml += `<tr><td>${game.home.name}</td><td>${game.home.score}</td>` +
+                   `<td>${game.away.score}</td><td>${game.away.name}</td>` +
+                   `<td>${games[i].date.split('T')[0]}</td></tr>`;
     }
-
   }
 
-  // Close the table tag
   gamesHtml += '</table>';
 
   const body = /* html */ `
@@ -100,6 +93,7 @@ export function leikirTemplate(games) {
 
   return template(title, body);
 }
+
 
 
 
