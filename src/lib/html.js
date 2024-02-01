@@ -65,6 +65,7 @@ export function stodurTemplate(points) {
 
 
 export function leikirTemplate(games) {
+
   const title = 'Boltadeildin—leikir!';
 
 

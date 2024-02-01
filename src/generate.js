@@ -65,6 +65,8 @@ async function main() {
     });
 
   }
+
+
   //console.log(legalGamedays);
   for (let gameday of legalGamedays) {
     //console.log(gameday.date)
@@ -72,7 +74,7 @@ async function main() {
       //console.log(game)
     })
   }
-
+  //console.log(legalGamedays)
   legalGamedays.sort(function (x, y) {
     if (x.date < y.date) {
       return -1;
@@ -104,15 +106,18 @@ async function main() {
         pointsDict[game.home.name] += 1
         pointsDict[game.away.name] += 1
       }
-      //console.log(game)
+
     });
     //console.log(gameday)
   });
 
 
+
   var sortedPoints = Object.keys(pointsDict).map(function (key) {
     return [key, pointsDict[key]];
   });
+
+
 
   sortedPoints.sort(function (first, second) {
     return second[1] - first[1];
@@ -163,6 +168,8 @@ function isGameLegal(game) {
   }
   return true;
 }
+
+
 
 main().catch((error) => {
   console.error('error generating', error);
