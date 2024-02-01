@@ -1,11 +1,7 @@
 export function parseTeamsJson(data) {
+
   return JSON.parse(data);
-}
 
-
-
-export function parseGameJson(data) {
-  return JSON.parse(data);
 }
 
 /**
@@ -19,24 +15,37 @@ export function parseGameday(data) {
   try {
     parsed = JSON.parse(data);
   } catch (e) {
-    console.error('invalid data', e);
+    console.error('Invalid JSON data', e);
     return null;
   }
 
-  if (!parsed) {
-    console.warn('parsed data is not an object');
+  if (typeof parsed !== 'object' || parsed === null) {
+    console.warn('Parsed data is not an object');
     return null;
   }
 
-  if (!parsed.games) {
-    console.warn('missing games array');
+  if (!Array.isArray(parsed.games) || parsed.games.length === 0) {
+    console.warn('Missing or empty games array');
     return null;
   }
 
-  if (!parsed.date) {
-    console.warn('missing date string');
+  const isValidGames = parsed.games.every(game => {
+    return typeof game === 'object' && game !== null;
+    // Add more checks as necessary for game object structure
+  });
+
+  if (!isValidGames) {
+    console.warn('Invalid game objects in games array');
     return null;
   }
 
+  // Validate 'date' string in ISO 8601 format
+  if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/.test(parsed.date)) {
+    console.warn('Invalid or missing date string in ISO 8601 format');
+    return null;
+  }
+
+  // Data is valid, return the parsed object
   return parsed;
 }
+

@@ -38,13 +38,52 @@ export function stadaTemplate(standings) {
   return template(title, body);
 }
 
+export function stodurTemplate(points) {
+  // console.log(points)
+  // reikna stig og birta 
+  const tafla = `
+  <h1> Stöðutaflan </h1>
+  <div class="table">
+  <table>
+    <thead>
+      <tr>
+        <th>Sæti</th>
+        <th>Lið</th>
+        <th>Stig</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${points.map(stadaTemplate).join('')}
+    </tbody>
+  </table>
+</div>
+<p><a href="./index.html">Til baka</a></p>
+</div>
+  `;
+  return template('Stöðutafla', tafla)
+}
 export function leikirTemplate(games) {
   const title = 'Boltadeildin—leikir!';
-  const gamesHtml = games.toString();
+
+  // Initialize gamesHtml as an empty string
+  let gamesHtml = '';
+  //add table HTML
+  // gamesHtml += `
+  // Iterate through each game and concatenate its formatted string to gamesHtml
+  for (let i = 0; i < games.length; i++) {
+    for (let j = 0; j < games[i].games.length; j++) {
+      const game = games[i].games[j];
+      const gameStr = `${game.home.name} ${game.home.score} - ${game.away.score} ${game.away.name} ${games[i].date}<br>`;
+      gamesHtml += gameStr;
+    }
+  }
+
   const body = /* html */ `
   <section>
-  <h1>Leikir seinust vikna</h1>
+    <h1>Leikir seinust vikna</h1>
     ${gamesHtml}
   </section>`;
+
   return template(title, body);
 }
+

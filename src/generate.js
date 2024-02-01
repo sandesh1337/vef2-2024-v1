@@ -1,58 +1,166 @@
 import { writeFile } from 'fs/promises';
-import { join } from 'node:path';
+import { join } from 'path';
+import { indexTemplate, leikirTemplate, stodurTemplate } from './lib/html.js';
+
+
 import {
   createDirIfNotExists,
   readFile,
   readFilesFromDir,
 } from './lib/file.js';
 
-import { indexTemplate, leikirTemplate, stadaTemplate } from './lib/html.js';
-import { parseGameday } from './lib/parse.js';
-import { calculateStandings } from './lib/score.js';
+import {
+  parseGameday,
+  parseTeamsJson
+} from './lib/parse.js';
 
 const INPUT_DIR = './data';
 const OUTPUT_DIR = './dist';
 
+let teams;
 async function main() {
   await createDirIfNotExists(OUTPUT_DIR);
 
   const files = await readFilesFromDir(INPUT_DIR);
-
-  const data = [];
+  const potentialGamedays = [];
+  const legalGamedays = [];
 
   for await (const file of files) {
+    let isTeams = false;
     if (file.indexOf('gameday') < 0) {
-      continue;
+      if (file.indexOf('teams') >= 0) {
+        isTeams = true;
+      } else {
+        continue;
+      }
     }
     const fileContents = await readFile(file);
 
-    console.info('parsea skrá', file);
-    if (!fileContents) {
-      continue;
+    // parse-a file contents (lesa inn gogn og setja i breytur)
+    if (isTeams) {
+      teams = parseTeamsJson(fileContents);
+    } else {
+      let gameday = parseGameday(fileContents);
+      if (gameday !== null && gameday?.date !== null && gameday?.games?.length !== 0) {
+        potentialGamedays.push(gameday);
+      }
     }
-
-    const parsed = parseGameday(fileContents);
-
-    data.push(parsed);
   }
 
-  const calculatedStandings = calculateStandings(data);
 
-  // `data` er fylki af parsed gögnum sem við viljum
-  // skrifa niður í HTML skrá sem heitir `index.html`
-  // (og síðan í framhaldinu `stada.html` og `leikir.html`)
 
-  const indexHtml = indexTemplate();
-  const indexFilename = join(OUTPUT_DIR, 'index.html');
-  await writeFile(indexFilename, indexHtml);
+  for (let gameday of potentialGamedays) {
+    let date = gameday.date;
+    let legalGames = [];
+    for (let game of gameday.games) {
+      if (isGameLegal(game)) {
+        legalGames.push(game);
+        //console.log(game);
 
-  const stadaHtml = stadaTemplate(calculatedStandings);
-  const stadaFilename = join(OUTPUT_DIR, 'stada.html');
-  await writeFile(stadaFilename, stadaHtml);
+      }
+    }
+    legalGamedays.push({
+      date: date,
+      games: legalGames
+    });
 
-  const leikirHtml = leikirTemplate(data);
-  const leikirFilename = join(OUTPUT_DIR, 'leikir.html');
-  await writeFile(leikirFilename, leikirHtml);
+  }
+  //console.log(legalGamedays);
+  for (let gameday of legalGamedays) {
+    //console.log(gameday.date)
+    gameday.games.forEach((game) => {
+      //console.log(game)
+    })
+  }
+
+  legalGamedays.sort(function (x, y) {
+    if (x.date < y.date) {
+      return -1;
+    }
+    if (x.date > y.date) {
+      return 1;
+    }
+    return 0;
+  });
+
+  // reikna stig fyrir hver lið
+  let pointsDict = {};
+  // ef legalGamedays[?].games[?].home.score !== legalGamedays[0].games[0].away.score 
+  legalGamedays.forEach(gameday => {
+    gameday.games.forEach(game => {
+      if (!pointsDict[game.home.name]) {
+        pointsDict[game.home.name] = 0
+      }
+      if (!pointsDict[game.away.name]) {
+        pointsDict[game.away.name] = 0
+      }
+      if (game.home.score > game.away.score) {
+        pointsDict[game.home.name] += 3
+      }
+      if (game.home.score < game.away.score) {
+        pointsDict[game.away.name] += 3
+      }
+      if (game.home.score == game.away.score) {
+        pointsDict[game.home.name] += 1
+        pointsDict[game.away.name] += 1
+      }
+      //console.log(game)
+    });
+    //console.log(gameday)
+  });
+
+
+  var sortedPoints = Object.keys(pointsDict).map(function (key) {
+    return [key, pointsDict[key]];
+  });
+
+  sortedPoints.sort(function (first, second) {
+    return second[1] - first[1];
+  });
+
+  await writeFile(join(OUTPUT_DIR, 'index.html'), indexTemplate(), {
+    flag: 'w+',
+  });
+
+  //console.log("legalGamedays", legalGamedays)
+  //console.log(legalGamedays[0].games[0].home.name + " " + legalGamedays[0].games[0].home.score + " - " + legalGamedays[0].games[0].away.score + " " + legalGamedays[0].games[0].away.name + " " + legalGamedays[0].date)
+  await writeFile(join(OUTPUT_DIR, 'leikir.html'), leikirTemplate(legalGamedays), {
+    flag: 'w+',
+  });
+
+  await writeFile(join(OUTPUT_DIR, 'stada.html'), stodurTemplate(sortedPoints), {
+    flag: 'w+',
+  });
+}
+
+function isTeamLegal(team) {
+  return teams.includes(team);
+}
+
+function isScoreLegal(score) {
+  if (!Number.isInteger(score)) {
+    return false;
+  }
+  if (score < 0) {
+    return false;
+  }
+  return true;
+}
+
+function isGameLegal(game) {
+  if (!isTeamLegal(game.home.name)) {
+    return false;
+  }
+  if (!isTeamLegal(game.away.name)) {
+    return false;
+  }
+  if (!isScoreLegal(game.home.score)) {
+    return false;
+  }
+  if (!isScoreLegal(game.away.score)) {
+    return false;
+  }
+  return true;
 }
 
 main().catch((error) => {
