@@ -131,6 +131,7 @@ async function main() {
   await writeFile(join(OUTPUT_DIR, 'stada.html'), stodurTemplate(sortedPoints), {
     flag: 'w+',
   });
+
 }
 
 function isTeamLegal(team) {

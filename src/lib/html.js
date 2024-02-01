@@ -25,55 +25,64 @@ export function indexTemplate() {
 
   return template(title, body);
 }
-
-export function stadaTemplate(standings) {
-  const title = 'Boltadeildin—staðan!';
-  const standingsHtml = standings.toString();
-  const body = /* html */ `
-  <section>
-    <h1>Staðan í deildinni!</h1>
-    ${standingsHtml}
-  </section>`;
-
-  return template(title, body);
-}
-
-export function stodurTemplate(points) {
-  // console.log(points)
-  // reikna stig og birta 
-  const tafla = `
-  <h1> Stöðutaflan </h1>
-  <div class="table">
-  <table>
-    <thead>
-      <tr>
-        <th>Sæti</th>
-        <th>Lið</th>
-        <th>Stig</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${points.map(stadaTemplate).join('')}
-    </tbody>
-  </table>
-</div>
-<p><a href="./index.html">Til baka</a></p>
-</div>
+export function stadaTemplate(standing, index) {
+  // standing[0] is the team name, standing[1] is the points
+  // index + 1 is used for ranking, assuming the points array is pre-sorted
+  return `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${standing[0]}</td>
+      <td>${standing[1]}</td>
+    </tr>
   `;
-  return template('Stöðutafla', tafla)
 }
+export function stodurTemplate(points) {
+  // Since points is already sorted, just map through it to generate table rows
+  const tableBody = points.map(stadaTemplate).join('');
+
+  const table = `
+    <h1>Stöðutaflan</h1>
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Sæti</th>
+            <th>Lið</th>
+            <th>Stig</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableBody}
+        </tbody>
+      </table>
+    </div>
+    <p><a href="./index.html">Til baka</a></p>
+  `;
+
+  return template('Stöðutafla', table);
+}
+
+
+
 export function leikirTemplate(games) {
   const title = 'Boltadeildin—leikir!';
 
-  // Start gamesHtml with an opening table tag and header row
+
+
+  // Start gamesHtml with the table structure and header row
   let gamesHtml = '<table><tr><th>Home Team Name</th><th>Home Score</th><th>Away Score</th><th>Away Team Name</th><th>Date</th></tr>';
 
-  // Iterate through each game and add table rows with game data
+  // Iterate through each game day and each game
   for (let i = 0; i < games.length; i++) {
+    let gameDay = new Date(games[i].date);
+
+
+
     for (let j = 0; j < games[i].games.length; j++) {
       const game = games[i].games[j];
-      gamesHtml += `<tr><td>${game.home.name}</td><td>${game.home.score}</td><td>${game.away.score}</td><td>${game.away.name}</td><td>${games[i].date}</td></tr>`;
+      gamesHtml += `<tr><td>${game.home.name}</td><td>${game.home.score}</td><td>${game.away.score}</td><td>${game.away.name}</td><td>${games[i].date.split('T')[0]}</td></tr>`;
     }
+
   }
 
   // Close the table tag
@@ -81,7 +90,7 @@ export function leikirTemplate(games) {
 
   const body = /* html */ `
   <section>
-    <h1>Leikir seinust vikna</h1>
+    <h1>Alla Leikir</h1>
     ${gamesHtml}
   </section>`;
 
