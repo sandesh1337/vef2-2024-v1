@@ -65,18 +65,19 @@ export function stodurTemplate(points) {
 export function leikirTemplate(games) {
   const title = 'Boltadeildin—leikir!';
 
-  // Initialize gamesHtml as an empty string
-  let gamesHtml = '';
-  //add table HTML
-  // gamesHtml += `
-  // Iterate through each game and concatenate its formatted string to gamesHtml
+  // Start gamesHtml with an opening table tag and header row
+  let gamesHtml = '<table><tr><th>Home Team Name</th><th>Home Score</th><th>Away Score</th><th>Away Team Name</th><th>Date</th></tr>';
+
+  // Iterate through each game and add table rows with game data
   for (let i = 0; i < games.length; i++) {
     for (let j = 0; j < games[i].games.length; j++) {
       const game = games[i].games[j];
-      const gameStr = `${game.home.name} ${game.home.score} - ${game.away.score} ${game.away.name} ${games[i].date}<br>`;
-      gamesHtml += gameStr;
+      gamesHtml += `<tr><td>${game.home.name}</td><td>${game.home.score}</td><td>${game.away.score}</td><td>${game.away.name}</td><td>${games[i].date}</td></tr>`;
     }
   }
+
+  // Close the table tag
+  gamesHtml += '</table>';
 
   const body = /* html */ `
   <section>
@@ -86,4 +87,5 @@ export function leikirTemplate(games) {
 
   return template(title, body);
 }
+
 
