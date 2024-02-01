@@ -28,12 +28,11 @@ export function parseGameday(data) {
     console.warn('Missing or empty games array');
     return null;
   }
-
-  const isValidGames = parsed.games.every(game => {
-    return typeof game === 'object' && game !== null;
+  const isValidGames = parsed.games.every(game =>
+    typeof game === 'object' && game !== null
     // Add more checks as necessary for game object structure
-  });
-
+  );
+  
   if (!isValidGames) {
     console.warn('Invalid game objects in games array');
     return null;

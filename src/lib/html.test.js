@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { indexTemplate } from './html';
+import { indexTemplate, leikirTemplate } from './html';
 
 describe('html', () => {
   describe('indexTemplate', () => {
