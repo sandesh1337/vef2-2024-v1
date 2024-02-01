@@ -11,16 +11,17 @@
     "node": "20"
   },
   "scripts": {
-    "build": "node src/generate.js",
     "test": "cross-env NODE_OPTIONS='--experimental-vm-modules' NODE_NO_WARNINGS=1 jest ./*.test.js --silent",
     "test:coverage": "cross-env NODE_OPTIONS='--experimental-vm-modules' NODE_NO_WARNINGS=1 jest ./*.test.js --coverage",
     "lint": "concurrently npm:lint:*",
     "lint:eslint": "eslint ./src/**/*.js",
     "lint:stylelint": "stylelint ./public/styles.css",
-    "browser-sync": "browser-sync start --server --files 'public/**/*.*' --no-open --no-notify --directory"
+    "browser-sync": "browser-sync start --server --files 'public/**/*.*' --no-open --no-notify --directory",
+    "build": "node ./src/generate.js && cpy public dist"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
+    "cpy-cli": "^4.2.0",
     "browser-sync": "^3.0.2",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",

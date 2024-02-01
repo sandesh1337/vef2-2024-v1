@@ -1,7 +1,9 @@
 function template(title, body) {
   const html = /* html */ `
   <html>
+  
     <head>
+    <link rel="stylesheet" href="./public/styles.css">
       <title>${title}</title>
     </head>
     <body>
@@ -41,6 +43,7 @@ export function stodurTemplate(points) {
   const tableBody = points.map(stadaTemplate).join('');
 
   const table = `
+    
     <h1>Stöðutaflan</h1>
     <div class="table">
       <table>
@@ -75,7 +78,7 @@ export function leikirTemplate(games) {
 
   // Iterate through each game day and each game
   for (let i = 0; i < games.length; i++) {
-    let gameDay = new Date(games[i].date);
+    const gameDay = new Date(games[i].date);
 
 
 
@@ -97,5 +100,8 @@ export function leikirTemplate(games) {
 
   return template(title, body);
 }
+
+
+
 
 
