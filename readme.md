@@ -1,3 +1,5 @@
+NETLIFY LINK : https://65bc1c8081298d000924ebde--shimmering-cajeta-86cba6.netlify.app/
+
 # Vefforritun 2 2024, verkefni 1
 
 ## Markmið
